@@ -1,0 +1,329 @@
+---
+title: "Data Take Two"
+output: 
+  html_notebook: 
+    toc: yes
+    toc_float: yes
+---
+
+#Question 1: Roaming outdoor cats harm wildlife
+A high number strongly agrees whereas a low number disagrees. 
+
+####Question 1A: Roaming outdoor cats harm wildlife.
+
+Answers:  Strongly Agree = 7
+            Moderately Agree = 6
+            Slightly Agree = 5
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 3
+            Moderately Disagree = 2
+            Strongly Disagree = 1
+          
+####Question 1B: Roaming outdoor cats do not harm wildlife.
+
+Answers:  Strongly Agree = 1
+            Moderately Agree = 2
+            Slightly Agree = 3
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 5
+            Moderately Disagree = 6
+            Strongly Disagree = 7
+            
+```{r}
+
+library(car)
+
+df <- read.csv(file = "Raw_Data2.csv")
+
+df$A1Num <- as.numeric(df$A1)
+
+Q1A <- df[df[, "Q1"]=="Roaming outdoor cats harm wildlife",]
+Q1A <- Q1A[, c(1,2,3,12:17)]
+Q1A$A1Num <- recode(Q1A$A1Num,"1=6;2=2;3=4;4=5;5=3;6=7;7=1")
+
+Q1B <- df[df[, "Q1"]=="Roaming outdoor cats do not harm wildlife",]
+Q1B <- Q1B[, c(1,2,3,12:17)]
+Q1B$A1Num <- recode(Q1B$A1Num,"1=2;2=6;3=4;4=3;5=5;6=1;7=7")
+
+
+A <- as.numeric(Q1A$A1Num)
+B <- as.numeric(Q1B$A1Num)
+
+
+
+barplot(table(A), main = "Roaming outdoor cats HARM wildlife",xlab = "Disagree -> Neutral -> Agree",col = "light blue")
+barplot(table(B),main = "Roaming Cats DO NOT harm Wildlife",xlab = "Agree -> Neutral -> Disagree", col = "light blue")
+
+
+Data <- data.frame(
+       WtAnswer=c(A, B),
+       Question =factor(rep(c("A", "B"), times=c(length(A), length(B))))
+       )
+
+
+m <- aov(WtAnswer~Question,data = Data)
+summary(m)
+
+shapiro.test(Data$WtAnswer)
+
+print("From the output, the p-value < 0.05 implying that the distribution of the data are  significantly different from normal distribution. In other words, we can NOT assume the normality.")
+
+kruskal.test(WtAnswer ~ Question, data = Data) 
+
+print("At .05 significance level, we conclude that the two questions have different answers.")
+
+fligner.test(WtAnswer ~ Question, data = Data)
+
+
+
+
+```
+
+#Question 2: People should keep their cats indoors
+A high number strongly agrees whereas a low number disagrees. 
+
+###Question 2A: People should keep their cats indoors or under a person's control (e.g., leash, catio) while outdoorse.
+
+Answers:  Strongly Agree = 7
+            Moderately Agree = 6
+            Slightly Agree = 5
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 3
+            Moderately Disagree = 2
+            Strongly Disagree = 1
+          
+###Question 2B: People need not keep their cats indoors or under a person's control (e.g., leash, catio) while outdoors.
+
+Answers:  Strongly Agree = 1
+            Moderately Agree = 2
+            Slightly Agree = 3
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 5
+            Moderately Disagree = 6
+            Strongly Disagree = 7
+```{r}
+df <- read.csv(file = "Raw_Data2.csv")
+
+df$A2Num <- as.numeric(df$A2)
+
+Q2A <- df[df[, "Q2"]=="People should keep their cats indoors or under a person's control (e.g., leash, catio) while outdoors",]
+
+Q2A <- Q2A[, c(1,4,5,12:17)]
+Q2A$A2Num <- recode(Q2A$A2Num,"1=6;2=2;3=4;4=5;5=3;6=7;7=1")
+
+Q2B <- df[df[, "Q2"]=="People need not keep their cats indoors or under a person's control (e.g., leash, catio) while outdoors",]
+Q2B <- Q2B[, c(1,4,5,12:17)]
+Q2B$A2Num <- recode(Q2B$A2Num,"1=2;2=6;3=4;4=3;5=5;6=1;7=7")
+
+
+A <- as.numeric(Q2A$A2Num)
+B <- as.numeric(Q2B$A2Num)
+
+
+barplot(table(A), main = "People SHOULD keep their cats indoors",xlab = "Disagree -> Neutral -> Agree",col = "light blue")
+barplot(table(B),main = "People need NOT keep their cats indoors",xlab = "Agree -> Neutral -> Disagree", col = "light blue")
+
+
+Data <- data.frame(
+       WtAnswer=c(A, B),
+       Question =factor(rep(c("A", "B"), times=c(length(A), length(B))))
+       )
+
+
+m <- aov(WtAnswer~Question,data = Data)
+summary(m)
+
+shapiro.test(Data$WtAnswer)
+
+print("From the output, the p-value < 0.05 implying that the distribution of the data are  significantly different from normal distribution. In other words, we can NOT assume the normality.")
+
+kruskal.test(WtAnswer ~ Question, data = Data) 
+
+print("At .05 significance level, we conclude that the two questions have different answers.")
+```
+
+#Question 3: Pet cats should be spayed or neutered
+A high number strongly agrees whereas a low number disagrees. 
+
+###Question 3A: Pet cats should be spayed or neutered unless intended for breeding.
+
+Answers:  Strongly Agree = 7
+            Moderately Agree = 6
+            Slightly Agree = 5
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 3
+            Moderately Disagree = 2
+            Strongly Disagree = 1
+          
+###Question 3B: Pet cats not intended for breeding need not be spayed or neutered.
+
+Answers:  Strongly Agree = 1
+            Moderately Agree = 2
+            Slightly Agree = 3
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 5
+            Moderately Disagree = 6
+            Strongly Disagree = 7
+```{r}
+df <- read.csv(file = "Raw_Data2.csv")
+
+df$A3Num <- as.numeric(df$A3)
+
+Q3A <- df[df[, "Q3"]=="Pet cats should be spayed or neutered unless intended for breeding",]
+Q3A <- Q3A[, c(1,6,7,12:17)]
+Q3A$A3Num <- recode(Q3A$A3Num,"1=6;2=2;3=4;4=5;5=3;6=7;7=1")
+
+Q3B <- df[df[, "Q3"]=="Pet cats not intended for breeding need not be spayed or neutered",]
+Q3B <- Q3B[, c(1,6,7,12:17)]
+Q3B$A3Num <- recode(Q3B$A3Num,"1=2;2=6;3=4;4=3;5=5;6=1;7=7")
+
+
+A <- as.numeric(Q3A$A3Num)
+B <- as.numeric(Q3B$A3Num)
+
+
+barplot(table(A), main = "Pet cats should be spayed or neutered", xlab = "Disagree -> Neutral -> Agree",col = "light blue")
+barplot(table(B),main = "Pet cats need not be spayed or neutered",xlab = "Agree -> Neutral -> Disagree", col = "light blue")
+
+
+Data <- data.frame(
+       WtAnswer=c(A, B),
+       Question =factor(rep(c("A", "B"), times=c(length(A), length(B))))
+       )
+
+
+m <- aov(WtAnswer~Question,data = Data)
+summary(m)
+
+shapiro.test(Data$WtAnswer)
+
+print("From the output, the p-value < 0.05 implying that the distribution of the data are  significantly different from normal distribution. In other words, we can NOT assume the normality.")
+
+kruskal.test(WtAnswer ~ Question, data = Data) 
+
+print("At .05 significance level, we conclude that the two questions have different answers.")
+```
+#Question 4: Pet cats should be microchipped
+A high number strongly agrees whereas a low number disagrees. 
+
+###Question 4A: Pet cats should be microchipped (a microchip is a small identification device inserted under the animal's skin).
+
+Answers:  Strongly Agree = 7
+            Moderately Agree = 6
+            Slightly Agree = 5
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 3
+            Moderately Disagree = 2
+            Strongly Disagree = 1
+          
+###Question 4B: Pet cats need not be microchipped (a microchip is a small identification device inserted under the animal's skin).
+
+Answers:  Strongly Agree = 1
+            Moderately Agree = 2
+            Slightly Agree = 3
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 5
+            Moderately Disagree = 6
+            Strongly Disagree = 7
+```{r}
+df <- read.csv(file = "Raw_Data2.csv")
+
+df$A4Num <- as.numeric(df$A4)
+
+Q4A <- df[df[,"Q4"]=="Pet cats should be microchipped (a microchip is a small identification device inserted under the animal's skin)<br>",]
+Q4A <- Q4A[, c(1,8,9,12:17)]
+Q4A$A4Num <- recode(Q4A$A4Num,"1=6;2=2;3=4;4=5;5=3;6=7;7=1")
+
+Q4B <- df[df[, "Q4"]=="Pet cats need not be microchipped (a microchip is a small identification device inserted under the animal's skin)",]
+Q4B <- Q4B[, c(1,8,9,12:17)]
+Q4B$A4Num <- recode(Q4B$A4Num,"1=2;2=6;3=4;4=3;5=5;6=1;7=7")
+
+
+A <- as.numeric(Q4A$A4Num)
+B <- as.numeric(Q4B$A4Num)
+
+
+
+barplot(table(A), main = "Pet cats should be microchipped", xlab = "Disagree -> Neutral -> Agree",col = "light blue")
+barplot(table(B),main = "Pet cats need not be microchipped",xlab = "Agree -> Neutral -> Disagree", col = "light blue")
+
+
+Data <- data.frame(
+       WtAnswer=c(A, B),
+       Question =factor(rep(c("A", "B"), times=c(length(A), length(B))))
+       )
+
+
+m <- aov(WtAnswer~Question,data = Data)
+summary(m)
+
+shapiro.test(Data$WtAnswer)
+
+print("From the output, the p-value < 0.05 implying that the distribution of the data are  significantly different from normal distribution. In other words, we can NOT assume the normality.")
+
+kruskal.test(WtAnswer ~ Question, data = Data) 
+
+print("At .05 significance level, we conclude that the two questions have different answers.")
+```
+
+#Question 5: Roaming outdoor cats pose a risk to human health
+A high number strongly agrees whereas a low number disagrees. 
+
+###Question 5A: Roaming outdoor cats pose a risk to human health.
+
+Answers:  Strongly Agree = 7
+            Moderately Agree = 6
+            Slightly Agree = 5
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 3
+            Moderately Disagree = 2
+            Strongly Disagree = 1
+          
+###Question 5B: Roaming outdoor cats do not pose a risk to human health.
+
+Answers:  Strongly Agree = 1
+            Moderately Agree = 2
+            Slightly Agree = 3
+            Neither Agree or Disagree = 4
+            Slightly Disagree = 5
+            Moderately Disagree = 6
+            Strongly Disagree = 7
+```{r}
+df <- read.csv(file = "Raw_Data2.csv")
+
+df$A5Num <- as.numeric(df$A5)
+
+Q5A <- df[df[,"Q5"]=="Roaming outdoor cats pose a risk to human health<br>",]
+Q5A <- Q5A[, c(1,10,11,12:17)]
+Q5A$A5Num <- recode(Q5A$A5Num,"1=6;2=2;3=4;4=5;5=3;6=7;7=1")
+
+Q5B <- df[df[, "Q5"]=="Roaming outdoor cats do not pose a risk to human health",]
+Q5B <- Q5B[, c(1,10,11,12:17)]
+Q5B$A5Num <- recode(Q5B$A5Num,"1=2;2=6;3=4;4=3;5=5;6=1;7=7")
+
+
+A <- as.numeric(Q5A$A5Num)
+B <- as.numeric(Q5B$A5Num)
+
+
+barplot(table(A), main = "Roaming outdoor cats pose a risk to human health", xlab = "Disagree -> Neutral -> Agree",col = "light blue")
+barplot(table(B),main = "Roaming outdoor cats do not pose a risk to human health",xlab = "Agree -> Neutral -> Disagree", col = "light blue")
+
+
+Data <- data.frame(
+       WtAnswer=c(A, B),
+       Question =factor(rep(c("A", "B"), times=c(length(A), length(B))))
+       )
+
+
+m <- aov(WtAnswer~Question,data = Data)
+summary(m)
+
+shapiro.test(Data$WtAnswer)
+
+print("From the output, the p-value < 0.05 implying that the distribution of the data are  significantly different from normal distribution. In other words, we can NOT assume the normality.")
+
+kruskal.test(WtAnswer ~ Question, data = Data) 
+
+print("At .05 significance level, we conclude that the two questions have different answers.")
+```

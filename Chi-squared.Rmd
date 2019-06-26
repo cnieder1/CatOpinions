@@ -1,0 +1,110 @@
+---
+title: "Cat Perceptions Data"
+output: 
+  html_notebook: 
+    toc: yes
+    toc_float: yes
+---
+Question A (1): Roaming outdoor cats harm wildlife <br>
+Question B (2): Roaming outdoor cats do not harm wildlife<br>
+Question C (3): People should keep their cats indoors or under a person's control (e.g., leash, catio) while outdoors<br>
+Question D (4): People need not keep their cats indoors or under a person's control (e.g., leash, catio) while outdoors<br>
+Question E (5): Pet cats should be spayed or neutered unless intended for breeding<br>
+Question F (6): Pet cats not intended for breeding need not be spayed or neutered<br>
+Question G (7): Pet cats should be microchipped (a microchip is a small identification device inserted under the animal's skin)<br>
+Question H (8): Pet cats need not be microchipped (a microchip is a small identification device inserted under the animal's skin)<br>
+Question I (9): Roaming outdoor cats pose a risk to human health<br>
+Question J (10): Roaming outdoor cats do not pose a risk to human health<br>
+
+        
+
+
+```{r}
+df1 <- read.csv(file = "totals.csv")
+
+library("gplots")
+# 1. convert the data as a table
+dt <- as.table(as.matrix(df1[,c(4:10)]))
+# 2. Graph
+balloonplot(t(dt), main ="Cat Perceptions", xlab ="", ylab="Questions",
+            label = FALSE, show.margins = TRUE)
+
+```
+
+```{r}
+library("graphics")
+mosaicplot(dt, shade = TRUE, las=2,
+           main = "Cat Perceptions")
+```
+###Blue color indicates that the observed value is higher than the expected value if the data were random
+###Red color specifies that the observed value is lower than the expected value if the data were random
+
+```{r}
+df1 <- read.csv(file = "totals.csv")
+db <- df1[,c(4:10)]
+#dc <- read.delim(db, row.names = 1)
+chisq <- chisq.test(db)
+chisq
+qchisq(.95, df=54)
+
+```
+
+###The row and the column variables are not independent of each other. This implies that they are significantly associated. If the distribution of this data is due entirely to chance, then you have a 0.00000000...22% chance of finding a discrepancy between the observed and expected distributions that is at least this extreme. 
+```{r}
+chisq$observed
+round(chisq$expected,2)
+round(chisq$residuals, 3)
+library(corrplot)
+corrplot(chisq$residuals, is.cor = FALSE)
+
+```
+
+###Positive residuals are in blue. Positive values in cells specify an attraction (positive association) between the corresponding row and column variables.
+
+###Negative residuals are in red. This implies a repulsion (negative association) between the corresponding row and column variables.
+
+```{r}
+contrib <- 100*chisq$residuals^2/chisq$statistic
+round(contrib, 3)
+
+# Visualize the contribution
+corrplot(contrib, is.cor = FALSE)
+```
+
+###The relative contribution of each cell to the total Chi-square score give some indication of the nature of the dependency between rows and columns of the contingency table.
+
+```{r}
+dm <- df1[,c(1,4:10)]
+
+dm$Q <-  c(1:10)
+dm$agree <- dm$SLA + dm$MA + dm$STA
+dm$nutral <- dm$N
+dm$disagree <- dm$SLD + dm$MD + dm$STD
+
+dmsimp <- dm[,9:12]
+
+dt <- as.table(as.matrix(dmsimp[,2:4]))
+# 2. Graph
+balloonplot(t(dt), main ="Cat Perceptions", xlab ="", ylab="Questions",
+            label = FALSE, show.margins = TRUE)
+
+library("graphics")
+mosaicplot(dmsimp, shade = TRUE, las=2,
+           main = "Cat Perceptions")
+```
+```{r}
+chisq <- chisq.test(dmsimp[2:4])
+chisq
+qchisq(.95, df=18)
+
+chisq$observed
+round(chisq$expected,2)
+round(chisq$residuals, 3)
+library(corrplot)
+corrplot(chisq$residuals, is.cor = FALSE)
+```
+
+
+
+
+
